@@ -4,17 +4,24 @@ import { getAuth,
         signInWithPopup,
         GoogleAuthProvider 
         }from 'firebase/auth';
+import { getFirestore,
+         doc,
+         getDoc,
+         setDoc } 
+         from 'firebase/firestore'
 
 const firebaseConfig = {
-    apiKey: "AIzaSyC6OsEsEy5VxO1ghYaZ0x_6F-Lz0BnJO0s",
-    authDomain: "clothing-db-8666d.firebaseapp.com",
-    projectId: "clothing-db-8666d",
-    storageBucket: "clothing-db-8666d.appspot.com",
-    messagingSenderId: "453684222715",
-    appId: "1:453684222715:web:95aa40b71931ee47bd2e5e"
+  apiKey: "AIzaSyAVMWvSNqzz-gkXuxyUY0hQTDhxpll4y5I",
+  authDomain: "crwn-clothing-db-7ce31.firebaseapp.com",
+  projectId: "crwn-clothing-db-7ce31",
+  storageBucket: "crwn-clothing-db-7ce31.appspot.com",
+  messagingSenderId: "713665255555",
+  appId: "1:713665255555:web:468f961ab5923abb55e3b6",
+  measurementId: "G-4TZ6ZW5S55"
   };
   
   // Initialize Firebase
+  // eslint-disable-next-line no-unused-vars
   const firebaseApp = initializeApp(firebaseConfig);
 
   const provider = new GoogleAuthProvider();
@@ -23,4 +30,29 @@ const firebaseConfig = {
   });
 
   export const auth = getAuth();
-  export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+
+export const db = getFirestore();
+
+export const createUserDocumentFromAuth = async (userAuth) => {
+  const userDocRef = doc(db, 'users', userAuth.uid);
+
+  const userSnapshot = await getDoc(userDocRef);
+
+  if (!userSnapshot.exists()) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      await setDoc(userDocRef, {
+        displayName,
+        email,
+        createdAt,
+      });
+    } catch (error) {
+      console.log('error creating the user', error.message);
+    }
+  }
+
+  return userDocRef;
+};
